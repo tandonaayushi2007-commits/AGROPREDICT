@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroPredict | Smart Crop Recommendation System</title>
+    <!-- Google Fonts for modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main Agriculture Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Background Decor Elements -->
+    <div class="bg-shape bg-shape-1" aria-hidden="true"></div>
+    <div class="bg-shape bg-shape-2" aria-hidden="true"></div>
+
+    <!-- Header Navigation -->
+    <header class="app-header">
+        <div class="container header-container">
+            <div class="brand">
+                <div class="brand-icon">🌱</div>
+                <div class="brand-text">
+                    <h1>AgroPredict</h1>
+                    <span class="brand-badge">Random Forest AI</span>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <a href="#predictor" class="nav-link active">Predictor</a>
+                <a href="#history-section" class="nav-link">History</a>
+                <a href="#about" class="nav-link">About Model</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-badge">🚜 Precision Farming Assistant</div>
+            <h2 class="hero-title">Discover the Best Crop for Your Soil & Climate</h2>
+            <p class="hero-subtitle">
+                AgroPredict uses a trained Scikit-Learn Random Forest Classifier (99.5% accuracy)
+                to analyze soil nutrients and climate parameters, delivering personalized crop guidance.
+            </p>
+
+            <!-- Quick Presets for Instant Testing -->
+            <div class="presets-wrapper">
+                <span class="presets-label">⚡ Quick Presets:</span>
+                <div class="presets-container" id="presetsContainer">
+                    <button type="button" class="preset-chip" data-preset="rice">🌾 Rice Paddy</button>
+                    <button type="button" class="preset-chip" data-preset="coffee">☕ Coffee Plantation</button>
+                    <button type="button" class="preset-chip" data-preset="cotton">🧵 Cotton (Black Soil)</button>
+                    <button type="button" class="preset-chip" data-preset="apple">🍎 Apple Orchard</button>
+                    <button type="button" class="preset-chip" data-preset="watermelon">🍉 Watermelon Field</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Predictor Grid Layout -->
+        <div class="dashboard-grid" id="predictor">
+            <!-- Left Column: Input Form Card -->
+            <div class="card form-card">
+                <div class="card-header">
+                    <div class="card-title-group">
+                        <span class="card-header-icon">🧪</span>
+                        <div>
+                            <h3 class="card-title">Soil & Climate Parameters</h3>
+                            <p class="card-caption">Enter your farm's laboratory and weather metrics</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Global Error Alert -->
+                <div id="formAlert" class="alert alert-error hidden" role="alert">
+                    <span class="alert-icon">⚠️</span>
+                    <span id="alertMessage" class="alert-text"></span>
+                </div>
+
+                <form id="predictionForm" novalidate>
+                    <!-- Nutrient Group -->
+                    <div class="form-group-section">
+                        <h4 class="section-title">
+                            <span>🌱 Soil Nutrients (NPK)</span>
+                            <span class="section-hint">Values measured in kg/ha</span>
+                        </h4>
+                        <div class="inputs-grid-3">
+                            <!-- Nitrogen (N) -->
+                            <div class="input-field-wrapper" id="wrapper-N">
+                                <div class="field-label-row">
+                                    <label for="input-N">Nitrogen (N)</label>
+                                    <span class="unit-pill">kg/ha</span>
+                                </div>
+                                <div class="input-with-icon">
+                                    <input type="number" id="input-N" name="N" placeholder="e.g. 90" min="0" max="140" step="any" required>
+                                </div>
+                                <div class="field-footer">
+                                    <span class="hint-text">Typical: 0 – 140</span>
+                                    <span class="error-msg" id="error-N"></span>
+                                </div>
+                            </div>
+
+                            <!-- Phosphorus (P) -->
+                            <div class="input-field-wrapper" id="wrapper-P">
+                                <div class="field-label-row">
+                                    <label for="input-P">Phosphorus (P)</label>
+                                    <span class="unit-pill">kg/ha</span>
+                                </div>
+                                <div class="input-with-icon">
+                                    <input type="number" id="input-P" name="P" placeholder="e.g. 42" min="5" max="145" step="any" required>
+                                </div>
+                                <div class="field-footer">
+                                    <span class="hint-text">Typical: 5 – 145</span>
+                                    <span class="error-msg" id="error-P"></span>
+                                </div>
+                            </div>
+
+                            <!-- Potassium (K) -->
+                            <div class="input-field-wrapper" id="wrapper-K">
+                                <div class="field-label-row">
+                                    <label for="input-K">Potassium (K)</label>
+                                    <span class="unit-pill">kg/ha</span>
+                                </div>
+                                <div class="input-with-icon">
+                                    <input type="number" id="input-K" name="K" placeholder="e.g. 43" min="5" max="205" step="any" required>
+                                </div>
+                                <div class="field-footer">
+                                    <span class="hint-text">Typical: 5 – 205</span>
+                                    <span class="error-msg" id="error-K"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Environmental Group -->
+                    <div class="form-group-section">
+                        <h4 class="section-title">
+                            <span>⛅ Climate & Soil Environment</span>
+                            <span class="section-hint">Regional climatic conditions</span>
+                        </h4>
+                        <div class="inputs-grid-2">
+                            <!-- Temperature -->
+                            <div class="input-field-wrapper" id="wrapper-temperature">
+                                <div class="field-label-row">
+                                    <label for="input-temperature">Temperature</label>
+                                    <span class="unit-pill">°C</span>
+                                </div>
+                                <div class="input-with-icon">
+                                    <input type="number" id="input-temperature" name="temperature" placeholder="e.g. 21.5" min="8" max="45" step="0.1" required>
+                                </div>
+                                <div class="field-footer">
+                                    <span class="hint-text">Range: 8.0 – 45.0 °C</span>
+                                    <span class="error-msg" id="error-temperature"></span>
+                                </div>
+                            </div>
+
+                            <!-- Humidity -->
+                            <div class="input-field-wrapper" id="wrapper-humidity">
+                                <div class="field-label-row">
+                                    <label for="input-humidity">Relative Humidity</label>
+                                    <span class="unit-pill">%</span>
+                                </div>
+                                <div class="input-with-icon">
+                                    <input type="number" id="input-humidity" name="humidity" placeholder="e.g. 82.0" min="10" max="100" step="0.1" required>
+                                </div>
+                                <div class="field-footer">
+                                    <span class="hint-text">Range: 10 – 100 %</span>
+                                    <span class="error-msg" id="error-humidity"></span>
+                                </div>
+                            </div>
+
+                            <!-- Soil pH -->
+                            <div class="input-field-wrapper" id="wrapper-ph">
+                                <div class="field-label-row">
+                                    <label for="input-ph">Soil pH</label>
+                                    <span class="unit-pill">0 - 14</span>
+                                </div>
+                                <div class="input-with-icon">
+                                    <input type="number" id="input-ph" name="ph" placeholder="e.g. 6.5" min="3.5" max="10" step="0.01" required>
+                                </div>
+                                <div class="field-footer">
+                                    <span class="hint-text">Typical: 3.5 – 10.0</span>
+                                    <span class="error-msg" id="error-ph"></span>
+                                </div>
+                            </div>
+
+                            <!-- Rainfall -->
+                            <div class="input-field-wrapper" id="wrapper-rainfall">
+                                <div class="field-label-row">
+                                    <label for="input-rainfall">Rainfall</label>
+                                    <span class="unit-pill">mm</span>
+                                </div>
+                                <div class="input-with-icon">
+                                    <input type="number" id="input-rainfall" name="rainfall" placeholder="e.g. 210.0" min="20" max="300" step="0.1" required>
+                                </div>
+                                <div class="field-footer">
+                                    <span class="hint-text">Range: 20 – 300 mm</span>
+                                    <span class="error-msg" id="error-rainfall"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="submit" id="btnPredict" class="btn btn-primary">
+                            <span class="btn-spinner hidden" id="predictSpinner" aria-hidden="true"></span>
+                            <span class="btn-icon">🌾</span>
+                            <span class="btn-text">Predict Recommended Crop</span>
+                        </button>
+                        <button type="button" id="btnReset" class="btn btn-secondary">
+                            <span class="btn-icon">🔄</span>
+                            <span class="btn-text">Reset Form</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Column: Prediction Result & Crop Info -->
+            <div class="card result-card" id="resultContainer">
+                <!-- Initial Placeholder / Empty State -->
+                <div class="result-placeholder" id="resultPlaceholder">
+                    <div class="placeholder-icon">🌱</div>
+                    <h3>Ready for Your Crop Analysis</h3>
+                    <p>
+                        Fill in the 7 agricultural parameters on the left or select a quick preset,
+                        then click <strong>Predict Recommended Crop</strong>.
+                    </p>
+                    <div class="placeholder-features">
+                        <div class="pf-item"><span>🎯</span> 99.5% AI Model Accuracy</div>
+                        <div class="pf-item"><span>🌾</span> 22 Supported Agricultural Crops</div>
+                        <div class="pf-item"><span>📖</span> Complete Agronomic Guidelines</div>
+                    </div>
+                </div>
+
+                <!-- Active Prediction View (Hidden initially) -->
+                <div class="prediction-content hidden" id="predictionContent">
+                    <!-- Hero Result Card Header -->
+                    <div class="prediction-hero">
+                        <div class="crop-avatar" id="cropAvatar">🌾</div>
+                        <div class="crop-headline">
+                            <span class="hero-tag">Recommended Crop</span>
+                            <h2 class="crop-title" id="cropTitle">Rice</h2>
+                            <p class="crop-scientific" id="cropScientific">Oryza sativa</p>
+                        </div>
+                        <div class="confidence-box">
+                            <span class="confidence-val" id="confidenceValue">99.5%</span>
+                            <span class="confidence-lbl">Model Match</span>
+                        </div>
+                    </div>
+
+                    <!-- Category & Description -->
+                    <div class="crop-summary">
+                        <span class="category-badge" id="cropCategory">Cereal Grain / Staple Food</span>
+                        <p class="crop-desc" id="cropDescription"></p>
+                    </div>
+
+                    <!-- Key Agronomic Parameters Grid -->
+                    <div class="crop-specs-grid">
+                        <div class="spec-card">
+                            <span class="spec-icon">🌍</span>
+                            <div>
+                                <span class="spec-label">Optimal Soil</span>
+                                <span class="spec-value" id="specSoil">Clayey loam</span>
+                            </div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-icon">🌡️</span>
+                            <div>
+                                <span class="spec-label">Ideal Temp</span>
+                                <span class="spec-value" id="specTemp">20°C - 35°C</span>
+                            </div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-icon">💧</span>
+                            <div>
+                                <span class="spec-label">Water Requirement</span>
+                                <span class="spec-value" id="specWater">High</span>
+                            </div>
+                        </div>
+                        <div class="spec-card">
+                            <span class="spec-icon">🗓️</span>
+                            <div>
+                                <span class="spec-label">Growing Season</span>
+                                <span class="spec-value" id="specSeason">Kharif</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Farming Tips Accordion / Box -->
+                    <div class="farming-guide-box">
+                        <h4 class="guide-title">📋 Practical Agronomic & Cultivation Tips</h4>
+                        <ul class="farming-tips-list" id="farmingTipsList">
+                            <!-- Injected dynamically -->
+                        </ul>
+                    </div>
+
+                    <!-- Economic & Market Value -->
+                    <div class="market-value-box">
+                        <span class="market-icon">💰</span>
+                        <div class="market-text">
+                            <strong>Economic Potential: </strong>
+                            <span id="cropMarketValue">Strong local and export demand.</span>
+                        </div>
+                    </div>
+
+                    <!-- Alternative Predictions Bar -->
+                    <div class="alternatives-box" id="alternativesBox">
+                        <h4 class="alternatives-title">Alternative Crop Probability Rankings</h4>
+                        <div class="alternatives-list" id="alternativesList">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prediction History Section -->
+        <section class="card history-card" id="history-section">
+            <div class="history-header">
+                <div class="history-title-group">
+                    <span class="card-header-icon">📜</span>
+                    <div>
+                        <h3 class="card-title">Prediction History</h3>
+                        <p class="card-caption">Track past recommendations saved securely in your browser</p>
+                    </div>
+                </div>
+                <div class="history-actions">
+                    <span class="history-counter" id="historyCount">0 entries</span>
+                    <button type="button" id="btnClearHistory" class="btn btn-outline-danger">
+                        <span>🗑️ Clear History</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- History List Table/Container -->
+            <div class="history-table-wrapper" id="historyWrapper">
+                <div class="history-empty" id="historyEmpty">
+                    <span class="empty-icon">📂</span>
+                    <p>No predictions made yet. Run a prediction to see it recorded here.</p>
+                </div>
+                <table class="history-table hidden" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Recommended Crop</th>
+                            <th>Confidence</th>
+                            <th>Parameters (N, P, K, T, H, pH, Rain)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTbody">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- About the Model Section -->
+        <section class="card about-model-card" id="about">
+            <div class="about-model-header">
+                <div class="about-badge">🌱 Machine Learning Intelligence</div>
+                <h3 class="about-model-title">About the Model</h3>
+                <p class="about-model-subtitle">Precision Agriculture Powered by Scikit-Learn Random Forest Classifier</p>
+            </div>
+
+            <div class="about-model-body">
+                <div class="about-model-text-box">
+                    <p class="about-model-content">
+                        AgroPredict uses a Machine Learning-based Random Forest Classifier to recommend the most suitable crop based on soil and environmental conditions. The model analyzes seven important parameters: Nitrogen (N), Phosphorus (P), Potassium (K), temperature, humidity, soil pH, and rainfall. It is trained on the Crop Recommendation dataset containing different crop categories and their suitable growing conditions. By learning patterns between these parameters and crop requirements, the model predicts the crop that is most suitable for the given conditions. The system is designed to assist farmers and users in making more informed crop selection decisions.
+                    </p>
+                </div>
+
+                <!-- Seven Key Analyzed Parameters Grid -->
+                <div class="model-features-summary">
+                    <h4 class="features-summary-title">Seven Key Analyzed Parameters</h4>
+                    <div class="parameter-badges-grid">
+                        <div class="param-badge-item">
+                            <span class="param-badge-icon">🧪</span>
+                            <div class="param-badge-info">
+                                <strong>Nitrogen (N)</strong>
+                                <span>Soil vegetative growth</span>
+                            </div>
+                        </div>
+                        <div class="param-badge-item">
+                            <span class="param-badge-icon">🔬</span>
+                            <div class="param-badge-info">
+                                <strong>Phosphorus (P)</strong>
+                                <span>Root & blossom strength</span>
+                            </div>
+                        </div>
+                        <div class="param-badge-item">
+                            <span class="param-badge-icon">🌿</span>
+                            <div class="param-badge-info">
+                                <strong>Potassium (K)</strong>
+                                <span>Disease & drought resistance</span>
+                            </div>
+                        </div>
+                        <div class="param-badge-item">
+                            <span class="param-badge-icon">🌡️</span>
+                            <div class="param-badge-info">
+                                <strong>Temperature</strong>
+                                <span>Thermal growth zone</span>
+                            </div>
+                        </div>
+                        <div class="param-badge-item">
+                            <span class="param-badge-icon">💧</span>
+                            <div class="param-badge-info">
+                                <strong>Humidity</strong>
+                                <span>Atmospheric moisture level</span>
+                            </div>
+                        </div>
+                        <div class="param-badge-item">
+                            <span class="param-badge-icon">⚖️</span>
+                            <div class="param-badge-info">
+                                <strong>Soil pH</strong>
+                                <span>Acidity & nutrient uptake</span>
+                            </div>
+                        </div>
+                        <div class="param-badge-item">
+                            <span class="param-badge-icon">🌧️</span>
+                            <div class="param-badge-info">
+                                <strong>Rainfall</strong>
+                                <span>Hydrological availability</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Highlights Row -->
+                <div class="model-highlights-row">
+                    <div class="highlight-pill">
+                        <span class="hp-icon">🎯</span>
+                        <span><strong>99.55%</strong> Verified Accuracy</span>
+                    </div>
+                    <div class="highlight-pill">
+                        <span class="hp-icon">🌾</span>
+                        <span><strong>22</strong> Agricultural Crop Classes</span>
+                    </div>
+                    <div class="highlight-pill">
+                        <span class="hp-icon">⚡</span>
+                        <span><strong>Instant</strong> Real-Time Prediction</span>
+                    </div>
+                    <div class="highlight-pill">
+                        <span class="hp-icon">🚜</span>
+                        <span><strong>Practical</strong> Agronomic Guidance</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Professional Footer -->
+    <footer class="app-footer">
+        <div class="container footer-content-wrapper">
+            <div class="footer-top-grid">
+                <!-- Branding Column -->
+                <div class="footer-brand-col">
+                    <div class="footer-brand-header">
+                        <span class="footer-brand-icon">🌱</span>
+                        <div>
+                            <h3 class="footer-brand-title">AgroPredict</h3>
+                            <p class="footer-system-subtitle">AI-Based Agriculture Crop Recommendation System</p>
+                        </div>
+                    </div>
+                    <p class="footer-tagline-text">
+                        Empowering farmers and agricultural planners with intelligent, machine learning-driven crop suitability insights based on soil chemistry and meteorological conditions.
+                    </p>
+                </div>
+
+                <!-- Developer Attribution Column -->
+                <div class="footer-dev-col">
+                    <h4 class="dev-section-heading">Developed by:</h4>
+                    <div class="dev-cards-container">
+                        <div class="developer-card">
+                            <div class="dev-icon-badge">👩‍💻</div>
+                            <div class="developer-details">
+                                <span class="developer-name">Aayushi Tandon</span>
+                                <span class="developer-id">ID: 72511209</span>
+                            </div>
+                        </div>
+                        <div class="developer-card">
+                            <div class="dev-icon-badge">👨‍💻</div>
+                            <div class="developer-details">
+                                <span class="developer-name">Amritpal</span>
+                                <span class="developer-id">ID: 72512012</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Copyright & Credit Strip -->
+            <div class="footer-bottom-strip">
+                <p class="footer-copy">
+                    &copy; 2026 <strong>AgroPredict</strong> — AI-Based Agriculture Crop Recommendation System
+                </p>
+                <p class="footer-dev-credit">
+                    Developed by: <strong>Aayushi Tandon (72511209)</strong> &amp; <strong>Amritpal (72512012)</strong>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Frontend Application Logic -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
